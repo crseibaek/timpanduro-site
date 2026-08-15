@@ -1,0 +1,21 @@
+---
+import site from '../data/site.json';
+import { t, type Lang } from '../data/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t(lang);
+const year = 2026;
+---
+
+<footer class="site-footer">
+  <div class="wrap inner">
+    <span>© {year} {site.name}{site.cvr ? ` · CVR ${site.cvr}` : ''}</span>
+    <span>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      {site.phone && <span> · {site.phone}</span>}
+    </span>
+  </div>
+</footer>

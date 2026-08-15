@@ -1,0 +1,13 @@
+---
+import { getCollection } from 'astro:content';
+import OfferPage from '../../../components/OfferPage.astro';
+
+export async function getStaticPaths() {
+  const offers = await getCollection('offers', (o) => o.data.published);
+  return offers.map((offer) => ({ params: { slug: offer.id }, props: { offer } }));
+}
+
+const { offer } = Astro.props;
+---
+
+<OfferPage lang="en" offer={offer} />

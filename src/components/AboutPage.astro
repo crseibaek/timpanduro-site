@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import site from '../data/site.json';
+import { t, type Lang } from '../data/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t(lang);
+const paras = lang === 'en' ? site.about_en : site.about_da;
+const role = lang === 'en' ? site.role_en : site.role_da;
+const city = lang === 'en' ? site.city_en : site.city_da;
+---
+
+<Base
+  lang={lang}
+  title={`${s.aboutTitle} — ${site.name}`}
+  description={paras[0]}
+  altPath={lang === 'da' ? '/about' : '/om'}
+>
+  <div class="wrap about">
+    <div>
+      <img src={site.portrait} alt={site.name} width="800" height="1000" />
+    </div>
+    <div>
+      <p class="label">{role} · {city}</p>
+      <h1 class="h2" style="margin:0.6rem 0 1.4rem">{s.aboutTitle}</h1>
+      {paras.map((p) => <p>{p}</p>)}
+
+      <div class="contact-list">
+        <p class="label" style="margin:0 0 0.5rem">{s.contact}</p>
+        <span><a href={`mailto:${site.email}`}>{site.email}</a></span>
+        {site.phone && <span><a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a></span>}
+        {site.vimeo && <span><a href={site.vimeo} rel="noopener">Vimeo</a></span>}
+        {site.instagram && <span><a href={site.instagram} rel="noopener">Instagram</a></span>}
+        {site.linkedin && <span><a href={site.linkedin} rel="noopener">LinkedIn</a></span>}
+      </div>
+    </div>
+  </div>
+</Base>

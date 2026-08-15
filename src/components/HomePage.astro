@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import Gallery from './Gallery.astro';
+import Lightbox from './Lightbox.astro';
+import site from '../data/site.json';
+import { t, type Lang } from '../data/ui';
+import { getProductions, toCard, resolveThumbnails } from '../lib/catalogue';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t(lang);
+
+const productions = await getProductions();
+const thumbs = await resolveThumbnails(productions);
+const cards = productions.map((p) => toCard(p, lang, thumbs));
+const tagline = lang === 'en' ? site.tagline_en : site.tagline_da;
+const role = lang === 'en' ? site.role_en : site.role_da;
+const city = lang === 'en' ? site.city_en : site.city_da;
+---
+
+<Base
+  lang={lang}
+  title={`${site.name} — ${role}`}
+  description={tagline}
+  altPath="/"
+>
+  <div class="wrap">
+    <section class="intro">
+      <p class="label">{role} · {city}</p>
+      <h1 class="display">{site.name}</h1>
+      <p class="lede">{tagline}</p>
+      <p class="label">{cards.length}+ {s.productions} · 2011—2026</p>
+    </section>
+
+    <Gallery lang={lang} cards={cards} filters={true} />
+  </div>
+
+  <Lightbox lang={lang} />
+</Base>

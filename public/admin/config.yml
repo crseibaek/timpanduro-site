@@ -1,0 +1,154 @@
+# ---------------------------------------------------------------------------
+# Admin configuration.
+#
+# ONE THING TO CHANGE BEFORE DEPLOYING:
+#   backend.repo -> your GitHub "username/repository"
+#
+# base_url points at this same site — the login is handled by two small
+# functions in netlify/functions/ (auth.mts and callback.mts), so there is no
+# third service to sign up for.
+# ---------------------------------------------------------------------------
+
+backend:
+  name: github
+  repo: BRUGERNAVN/REPOSITORY
+  branch: main
+  base_url: https://timpanduro.com
+  auth_endpoint: auth
+
+# Where uploaded stills are stored.
+media_folder: public/thumbs
+public_folder: /thumbs
+
+locale: da
+
+collections:
+  # -------------------------------------------------------------------------
+  # 1. The catalogue. One entry per production.
+  # -------------------------------------------------------------------------
+  - name: productions
+    label: Produktioner
+    label_singular: Produktion
+    folder: src/content/productions
+    create: true
+    slug: '{{title_da}}'
+    identifier_field: title_da
+    summary: '{{title_da}} — {{client}} ({{year}})'
+    sortable_fields: ['order', 'year', 'title_da']
+    view_groups:
+      - label: Kategori
+        field: category
+    fields:
+      - { label: 'Titel (dansk)', name: title_da, widget: string }
+      - { label: 'Titel (engelsk)', name: title_en, widget: string, required: false }
+      - { label: Kunde, name: client, widget: string, required: false }
+      - { label: År, name: year, widget: number, value_type: int, min: 1990, max: 2100 }
+      - label: Kategori
+        name: category
+        widget: select
+        options:
+          - { label: 'Film & fiktion', value: film }
+          - { label: 'Kultur & events', value: kultur }
+          - { label: 'Erhverv & produkt', value: erhverv }
+      - { label: 'Rolle (dansk)', name: role_da, widget: string, required: false, hint: 'F.eks. "Fotograf & klip"' }
+      - { label: 'Rolle (engelsk)', name: role_en, widget: string, required: false }
+      - { label: 'Beskrivelse (dansk)', name: description_da, widget: text, required: false }
+      - { label: 'Beskrivelse (engelsk)', name: description_en, widget: text, required: false }
+      - label: 'Vimeo-id'
+        name: vimeoId
+        widget: string
+        required: false
+        hint: 'Kun tallene fra vimeo.com/123456789 — altså 123456789'
+      - label: Still
+        name: thumbnail
+        widget: image
+        required: false
+        hint: 'Valgfrit. Uden billede bruges Vimeos eget thumbnail.'
+      - label: Rækkefølge
+        name: order
+        widget: number
+        value_type: int
+        default: 999
+        hint: 'Lavere tal ligger først på væggen. Lad stå på 999 for at lægge nederst.'
+      - { label: 'Fremhævet', name: featured, widget: boolean, default: false, required: false }
+      - { label: 'Kladde (vises ikke)', name: draft, widget: boolean, default: false, required: false }
+
+  # -------------------------------------------------------------------------
+  # 2. Tilbudssider. One entry becomes one /offers/<kunde> page.
+  # -------------------------------------------------------------------------
+  - name: offers
+    label: Tilbudssider
+    label_singular: Tilbudsside
+    folder: src/content/offers
+    create: true
+    slug: '{{customer}}'
+    identifier_field: customer
+    summary: '{{customer}} — {{date}}'
+    sortable_fields: ['date', 'customer']
+    fields:
+      - label: Kunde
+        name: customer
+        widget: string
+        hint: 'Navnet bliver også adressen. "Byhistorisk Museum" giver /offers/byhistorisk-museum'
+      - { label: Dato, name: date, widget: datetime, date_format: 'DD-MM-YYYY', time_format: false }
+      - { label: 'Overskrift (dansk)', name: headline_da, widget: string, required: false }
+      - { label: 'Overskrift (engelsk)', name: headline_en, widget: string, required: false }
+      - label: 'Din besked (dansk)'
+        name: intro_da
+        widget: text
+        hint: 'Skriv som i en mail. Tom linje mellem afsnit.'
+      - { label: 'Din besked (engelsk)', name: intro_en, widget: text, required: false, hint: 'Valgfrit. Uden tekst her vises den danske også på engelsk.' }
+      - label: 'Udvalgte film'
+        name: productions
+        widget: relation
+        collection: productions
+        multiple: true
+        value_field: '{{slug}}'
+        search_fields: ['title_da', 'title_en', 'client']
+        display_fields: ['title_da', 'year']
+        hint: 'Søg og vælg. Rækkefølgen her er rækkefølgen på siden.'
+      - { label: 'Afsluttende linje (dansk)', name: outro_da, widget: string, required: false }
+      - { label: 'Afsluttende linje (engelsk)', name: outro_en, widget: string, required: false }
+      - { label: Offentliggjort, name: published, widget: boolean, default: true }
+
+  # -------------------------------------------------------------------------
+  # 3. Site settings — name, contact details, about text, categories.
+  # -------------------------------------------------------------------------
+  - name: settings
+    label: Indstillinger
+    files:
+      - name: site
+        label: 'Navn, kontakt og om-tekst'
+        file: src/data/site.json
+        fields:
+          - { label: Navn, name: name, widget: string }
+          - { label: 'Kort navn', name: shortName, widget: string, required: false }
+          - { label: 'Titel (dansk)', name: role_da, widget: string }
+          - { label: 'Titel (engelsk)', name: role_en, widget: string }
+          - { label: 'Undertekst (dansk)', name: tagline_da, widget: text }
+          - { label: 'Undertekst (engelsk)', name: tagline_en, widget: text }
+          - { label: E-mail, name: email, widget: string }
+          - { label: Telefon, name: phone, widget: string, required: false }
+          - { label: 'By (dansk)', name: city_da, widget: string, required: false }
+          - { label: 'By (engelsk)', name: city_en, widget: string, required: false }
+          - { label: CVR, name: cvr, widget: string, required: false }
+          - { label: 'Vimeo-profil', name: vimeo, widget: string, required: false }
+          - { label: Instagram, name: instagram, widget: string, required: false }
+          - { label: LinkedIn, name: linkedin, widget: string, required: false }
+          - { label: Portrætfoto, name: portrait, widget: image, required: false }
+          - label: Kategorier
+            name: categories
+            widget: list
+            hint: 'Ændrer du kategorierne her, skal de samme valgmuligheder rettes i public/admin/config.yml under "Produktioner → Kategori".'
+            fields:
+              - { label: 'Id (må ikke ændres efter oprettelse)', name: id, widget: string }
+              - { label: 'Navn (dansk)', name: label_da, widget: string }
+              - { label: 'Navn (engelsk)', name: label_en, widget: string }
+          - label: 'Om mig (dansk)'
+            name: about_da
+            widget: list
+            field: { label: Afsnit, name: p, widget: text }
+          - label: 'Om mig (engelsk)'
+            name: about_en
+            widget: list
+            field: { label: Paragraph, name: p, widget: text }

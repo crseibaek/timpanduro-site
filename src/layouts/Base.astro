@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import site from '../data/site.json';
+import { t, type Lang } from '../data/ui';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  noindex?: boolean;
+  /** Path to the same page in the other language, or null to hide the toggle. */
+  altPath?: string | null;
+  bare?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description = '',
+  noindex = false,
+  altPath,
+  bare = false,
+} = Astro.props;
+const s = t(lang);
+---
+
+<!doctype html>
+<html lang={lang === 'da' ? 'da-DK' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0c0c0d" />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">{s.skip}</a>
+    {!bare && <Header lang={lang} altPath={altPath} />}
+    <main id="main">
+      <slot />
+    </main>
+    {!bare && <Footer lang={lang} />}
+  </body>
+</html>

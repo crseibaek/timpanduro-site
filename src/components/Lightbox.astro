@@ -1,0 +1,188 @@
+---
+import { t, type Lang } from '../data/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t(lang);
+---
+
+<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Video" hidden>
+  <button class="lb-close" type="button" data-lb-close>{s.close}</button>
+  <div class="lb-inner">
+    <div class="lb-frame" data-lb-frame></div>
+    <div class="lb-meta">
+      <div>
+        <h2 class="h2" data-lb-title></h2>
+        <p class="lb-desc" data-lb-desc></p>
+      </div>
+      <dl data-lb-dl></dl>
+    </div>
+    <div class="lb-nav">
+      <button type="button" data-lb-prev>← {s.prev}</button>
+      <button type="button" data-lb-next>{s.next} →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  type Card = {
+    id: string;
+    title: string;
+    client: string;
+    year: number;
+    category: string;
+    role: string;
+    description: string;
+    vimeoId: string;
+    thumb: string;
+  };
+
+  function boot() {
+    const catEl = document.querySelector<HTMLScriptElement>('script[data-catalogue]');
+    const strEl = document.querySelector<HTMLScriptElement>('script[data-strings]');
+    const lb = document.getElementById('lightbox');
+    const grid = document.querySelector<HTMLElement>('[data-gallery]');
+    if (!catEl || !strEl || !lb || !grid) return;
+
+    const cards: Card[] = JSON.parse(catEl.textContent || '[]');
+    const S = JSON.parse(strEl.textContent || '{}');
+
+    const frame = lb.querySelector<HTMLElement>('[data-lb-frame]')!;
+    const elTitle = lb.querySelector<HTMLElement>('[data-lb-title]')!;
+    const elDesc = lb.querySelector<HTMLElement>('[data-lb-desc]')!;
+    const elDl = lb.querySelector<HTMLElement>('[data-lb-dl]')!;
+    const btnPrev = lb.querySelector<HTMLButtonElement>('[data-lb-prev]')!;
+    const btnNext = lb.querySelector<HTMLButtonElement>('[data-lb-next]')!;
+
+    let current = -1;
+    let lastFocus: HTMLElement | null = null;
+
+    /** Indices of tiles currently visible, in DOM order. */
+    function visible(): number[] {
+      return Array.from(grid.querySelectorAll<HTMLElement>('.tile'))
+        .filter((el) => !el.hasAttribute('hidden'))
+        .map((el) => Number(el.dataset.index));
+    }
+
+    function row(term: string, val: string) {
+      if (!val) return '';
+      return `<dt>${term}</dt><dd>${val}</dd>`;
+    }
+
+    function render(i: number) {
+      const c = cards[i];
+      if (!c) return;
+      current = i;
+
+      frame.innerHTML = c.vimeoId
+        ? `<iframe src="https://player.vimeo.com/video/${encodeURIComponent(
+            c.vimeoId
+          )}?title=0&byline=0&portrait=0&dnt=1&autoplay=1" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="${c.title.replace(
+            /"/g,
+            '&quot;'
+          )}"></iframe>`
+        : `<div class="ph" style="background-image:url('${c.thumb}')"><span>${S.noVideo}</span></div>`;
+
+      elTitle.textContent = c.title;
+      elDesc.textContent = c.description || '';
+      elDl.innerHTML =
+        row(S.year, String(c.year)) +
+        row(S.client, c.client) +
+        row(S.role, c.role) +
+        row(S.category, S.cat?.[c.category] || '');
+
+      const vis = visible();
+      const pos = vis.indexOf(i);
+      btnPrev.disabled = pos <= 0;
+      btnNext.disabled = pos === -1 || pos >= vis.length - 1;
+    }
+
+    function open(i: number, trigger?: HTMLElement) {
+      lastFocus = trigger ?? null;
+      lb.hidden = false;
+      lb.classList.add('is-open');
+      document.body.classList.add('lb-open');
+      render(i);
+      lb.querySelector<HTMLButtonElement>('[data-lb-close]')?.focus();
+    }
+
+    function close() {
+      frame.innerHTML = '';
+      lb.hidden = true;
+      lb.classList.remove('is-open');
+      document.body.classList.remove('lb-open');
+      current = -1;
+      lastFocus?.focus();
+    }
+
+    function step(dir: number) {
+      const vis = visible();
+      const pos = vis.indexOf(current);
+      const nextPos = pos + dir;
+      if (nextPos < 0 || nextPos >= vis.length) return;
+      render(vis[nextPos]);
+      lb.scrollTo({ top: 0 });
+    }
+
+    grid.addEventListener('click', (e) => {
+      const tile = (e.target as HTMLElement).closest<HTMLElement>('.tile');
+      if (!tile) return;
+      open(Number(tile.dataset.index), tile);
+    });
+
+    lb.addEventListener('click', (e) => {
+      const el = e.target as HTMLElement;
+      if (el.closest('[data-lb-close]')) return close();
+      if (el.closest('[data-lb-prev]')) return step(-1);
+      if (el.closest('[data-lb-next]')) return step(1);
+      // Click on the backdrop (outside the content column) closes.
+      if (el === lb) close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
+    });
+
+    // Category filtering.
+    const filterBar = document.querySelector<HTMLElement>('.filters');
+    filterBar?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-filter]');
+      if (!btn) return;
+      const want = btn.dataset.filter!;
+      filterBar
+        .querySelectorAll<HTMLButtonElement>('button[data-filter]')
+        .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      grid.querySelectorAll<HTMLElement>('.tile').forEach((tile) => {
+        const show = want === 'all' || tile.dataset.category === want;
+        tile.toggleAttribute('hidden', !show);
+      });
+      try {
+        const url = new URL(location.href);
+        if (want === 'all') url.searchParams.delete('k');
+        else url.searchParams.set('k', want);
+        history.replaceState(null, '', url);
+      } catch {
+        /* file:// and some embeds disallow replaceState — filtering still works */
+      }
+    });
+
+    // Restore a filter from the URL so a filtered view can be linked to.
+    const wanted = new URL(location.href).searchParams.get('k');
+    if (wanted) {
+      filterBar
+        ?.querySelector<HTMLButtonElement>(`button[data-filter="${CSS.escape(wanted)}"]`)
+        ?.click();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+</script>

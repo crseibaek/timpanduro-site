@@ -1,0 +1,132 @@
+---
+import Base from '../layouts/Base.astro';
+import Gallery from './Gallery.astro';
+import Lightbox from './Lightbox.astro';
+import site from '../data/site.json';
+import { t, localePath, pick, type Lang } from '../data/ui';
+import { getProductions, toCard, resolveThumbnails } from '../lib/catalogue';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  lang: Lang;
+  offer: CollectionEntry<'offers'>;
+}
+const { lang, offer } = Astro.props;
+const s = t(lang);
+const d = offer.data;
+
+const all = await getProductions();
+const byId = new Map(all.map((p) => [p.id, p]));
+// Keep the order the CMS gave them, drop anything that no longer exists.
+const chosen = d.productions.map((id) => byId.get(id)).filter(Boolean) as typeof all;
+const thumbs = await resolveThumbnails(chosen);
+const cards = chosen.map((p) => toCard(p, lang, thumbs));
+
+const headline =
+  pick(lang, d.headline_da, d.headline_en) ||
+  (lang === 'en' ? 'A few films worth seeing' : 'Et par film, der er værd at se');
+const intro = pick(lang, d.intro_da, d.intro_en);
+const outro = pick(lang, d.outro_da, d.outro_en);
+const paras = intro.split(/\n{2,}/).filter(Boolean);
+
+const dateStr = new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'da-DK', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+}).format(d.date);
+
+const subject = encodeURIComponent(
+  lang === 'en' ? `Re: ${headline}` : `Vedr. ${headline}`
+);
+---
+
+<Base
+  lang={lang}
+  title={`${site.name} — ${d.customer}`}
+  noindex={true}
+  altPath={`/offers/${offer.id}`}
+>
+  <div class="wrap">
+    <section class="offer-head">
+      <span class="label to">{s.offerFor} {d.customer}</span>
+      <h1 class="display">{headline}</h1>
+    </section>
+
+    <section class="offer-body">
+      <div class="offer-note">
+        {paras.map((p) => <p>{p}</p>)}
+        <div class="offer-cta">
+          <a class="btn" href={`mailto:${site.email}?subject=${subject}`}>{s.offerContact}</a>
+          {site.phone && (
+            <a class="btn ghost" href={`tel:${site.phone.replace(/\s/g, '')}`}>{s.offerCall}</a>
+          )}
+        </div>
+      </div>
+
+      <aside>
+        <div style="display:flex; gap:1rem; align-items:center;">
+          <img
+            src={site.portrait}
+            alt=""
+            width="128"
+            height="128"
+            style="width:76px;height:76px;border-radius:50%;object-fit:cover;flex:none"
+          />
+          <div>
+            <div style="font-weight:500">{site.name}</div>
+            <div class="label" style="margin-top:0.25rem">
+              {lang === 'en' ? site.role_en : site.role_da}
+            </div>
+          </div>
+        </div>
+        <div class="contact-list" style="margin-top:1.25rem;padding-top:1.25rem">
+          <span><a href={`mailto:${site.email}`}>{site.email}</a></span>
+          {site.phone && <span><a href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a></span>}
+          <span class="label" style="margin-top:0.6rem">{s.written} {dateStr}</span>
+        </div>
+      </aside>
+    </section>
+
+    <section>
+      <p class="label" style="margin-bottom:1rem">
+        {s.offerSelection} — {cards.length}
+      </p>
+      <Gallery lang={lang} cards={cards} variant="offer" />
+    </section>
+
+    {outro && (
+      <section style="padding-bottom:1rem">
+        <p class="lede">{outro}</p>
+      </section>
+    )}
+
+    <section class="offer-foot">
+      <span>{site.name} · {site.email}</span>
+      <a class="btn ghost" href={localePath(lang, '/')}>{s.backToSite}</a>
+    </section>
+  </div>
+
+  <Lightbox lang={lang} />
+
+  <script is:inline define:vars={{ slug: offer.id, customer: d.customer }}>
+    // Fire-and-forget open tracking. Fails silently when the function is not
+    // deployed (e.g. local `astro dev`), and never blocks the page.
+    try {
+      const key = 'seen:' + slug;
+      const body = JSON.stringify({
+        slug,
+        customer,
+        ref: document.referrer || '',
+        repeat: !!sessionStorage.getItem(key),
+      });
+      sessionStorage.setItem(key, '1');
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }));
+      } else {
+        fetch('/api/track', { method: 'POST', body, keepalive: true }).catch(() => {});
+      }
+    } catch (e) {
+      /* tracking is never load-bearing */
+    }
+  </script>
+</Base>

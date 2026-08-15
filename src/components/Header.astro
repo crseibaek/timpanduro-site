@@ -1,0 +1,30 @@
+---
+import site from '../data/site.json';
+import { t, localePath, type Lang } from '../data/ui';
+
+interface Props {
+  lang: Lang;
+  altPath?: string | null;
+}
+const { lang, altPath } = Astro.props;
+const s = t(lang);
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const workHref = localePath(lang, '/');
+const aboutHref = localePath(lang, lang === 'da' ? '/om' : '/about');
+const other: Lang = lang === 'da' ? 'en' : 'da';
+const otherHref =
+  altPath === null ? null : localePath(other, altPath ?? '/');
+---
+
+<header class="site-header">
+  <div class="wrap inner">
+    <a class="wordmark" href={workHref}>{site.name}</a>
+    <nav class="nav">
+      <a href={workHref} aria-current={here === workHref.replace(/\/$/, '') || here === '/' && lang === 'da' ? 'page' : undefined}>{s.work}</a>
+      <a href={aboutHref} aria-current={here === aboutHref ? 'page' : undefined}>{s.about}</a>
+      <a href={`mailto:${site.email}`}>{s.contact}</a>
+      {otherHref && <a class="lang" href={otherHref} hreflang={other}>{s.langLabel}</a>}
+    </nav>
+  </div>
+</header>

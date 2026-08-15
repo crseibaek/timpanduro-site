@@ -1,0 +1,115 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base lang="da" title="Statistik" noindex={true} altPath={null}>
+  <div class="wrap" style="padding-block: clamp(3rem,8vw,6rem); max-width: 900px">
+    <p class="label">Internt</p>
+    <h1 class="h2" style="margin:0.6rem 0 0.75rem">Hvem har åbnet deres side</h1>
+    <p class="lede" style="font-size:1rem">
+      Viser hvornår hver kunde har åbnet sin tilbudsside. Ingen cookies, ingen
+      IP-adresser — kun tidspunkter.
+    </p>
+
+    <div class="field">
+      <input
+        type="password"
+        id="key"
+        placeholder="Adgangsnøgle"
+        autocomplete="current-password"
+      />
+      <button class="btn" id="go" type="button">Hent</button>
+    </div>
+
+    <p id="msg" style="color:var(--fg-faint); font-size:0.9rem; margin-top:1rem"></p>
+    <div id="out"></div>
+  </div>
+
+  <script>
+    const $ = (s: string) => document.querySelector(s) as HTMLElement;
+    const input = $('#key') as HTMLInputElement;
+    const msg = $('#msg');
+    const out = $('#out');
+
+    const fmt = (iso: string) =>
+      new Intl.DateTimeFormat('da-DK', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(new Date(iso));
+
+    const ago = (iso: string) => {
+      const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+      if (mins < 60) return `${mins} min. siden`;
+      const h = Math.round(mins / 60);
+      if (h < 48) return `${h} timer siden`;
+      return `${Math.round(h / 24)} dage siden`;
+    };
+
+    async function load() {
+      const key = input.value.trim();
+      if (!key) return;
+      msg.textContent = 'Henter …';
+      out.innerHTML = '';
+      try {
+        const r = await fetch(`/api/stats?key=${encodeURIComponent(key)}`);
+        if (r.status === 401) {
+          msg.textContent = 'Forkert nøgle.';
+          return;
+        }
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          msg.textContent = j.error || `Fejl (${r.status}).`;
+          return;
+        }
+        sessionStorage.setItem('statskey', key);
+        const { offers } = await r.json();
+        if (!offers.length) {
+          msg.textContent = 'Ingen sider er blevet åbnet endnu.';
+          return;
+        }
+        msg.textContent = '';
+        out.innerHTML = `
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Kunde</th><th>Åbninger</th><th>Personer</th>
+                <th>Sidst åbnet</th><th>Første gang</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${offers
+                .map(
+                  (o: any) => `
+                <tr>
+                  <td><a href="/offers/${o.slug}" style="border-bottom:1px solid var(--line)">${
+                    o.customer || o.slug
+                  }</a></td>
+                  <td class="num">${o.views}</td>
+                  <td class="num">${o.uniques}</td>
+                  <td>${fmt(o.last)} <span style="color:var(--fg-faint)">· ${ago(o.last)}</span></td>
+                  <td style="color:var(--fg-faint)">${fmt(o.first)}</td>
+                  <td style="color:var(--fg-faint)">${
+                    o.recent?.[0]?.ref ? 'via ' + o.recent[0].ref : ''
+                  }</td>
+                </tr>`
+                )
+                .join('')}
+            </tbody>
+          </table>`;
+      } catch (e) {
+        msg.textContent = 'Kunne ikke hente data. Er siden deployet på Netlify?';
+      }
+    }
+
+    $('#go').addEventListener('click', load);
+    input.addEventListener('keydown', (e) => {
+      if ((e as KeyboardEvent).key === 'Enter') load();
+    });
+
+    const saved = sessionStorage.getItem('statskey');
+    if (saved) {
+      input.value = saved;
+      load();
+    }
+  </script>
+</Base>

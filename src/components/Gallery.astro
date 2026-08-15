@@ -1,0 +1,84 @@
+---
+import { t, type Lang } from '../data/ui';
+import { categoryLabel, type Card } from '../lib/catalogue';
+import site from '../data/site.json';
+
+interface Props {
+  lang: Lang;
+  cards: Card[];
+  /** Show the category filter bar above the grid. */
+  filters?: boolean;
+  /** 'wall' = dense archive grid. 'offer' = larger, two-up. */
+  variant?: 'wall' | 'offer';
+}
+
+const { lang, cards, filters = false, variant = 'wall' } = Astro.props;
+const s = t(lang);
+const used = new Set(cards.map((c) => c.category));
+const cats = site.categories.filter((c) => used.has(c.id));
+---
+
+{
+  filters && cats.length > 1 && (
+    <div class="filters" role="group" aria-label={s.filterLabel}>
+      <button type="button" data-filter="all" aria-pressed="true">
+        {s.all}
+      </button>
+      {cats.map((c) => (
+        <button type="button" data-filter={c.id} aria-pressed="false">
+          {lang === 'en' ? c.label_en : c.label_da}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+<div class="wall" data-gallery data-variant={variant}>
+  {
+    cards.map((c, i) => (
+      <button
+        type="button"
+        class="tile"
+        data-index={i}
+        data-category={c.category}
+        aria-label={`${c.title}${c.year ? `, ${c.year}` : ''}`}
+      >
+        <img
+          src={c.thumb}
+          alt=""
+          loading={i < 6 ? 'eager' : 'lazy'}
+          decoding="async"
+          width="1280"
+          height="720"
+        />
+        <span class="scrim" />
+        <span class="play" aria-hidden="true">
+          <svg viewBox="0 0 10 12">
+            <path d="M0 0l10 6-10 6z" />
+          </svg>
+        </span>
+        <span class="cap">
+          <span>
+            <span class="t">{c.title}</span>
+            {c.client && <span class="c">{c.client}</span>}
+          </span>
+          <span class="y">{c.year}</span>
+        </span>
+      </button>
+    ))
+  }
+</div>
+
+<script type="application/json" data-catalogue set:html={JSON.stringify(cards)} />
+<script type="application/json" data-strings set:html={JSON.stringify({
+  close: s.close, year: s.year, client: s.client, role: s.role, category: s.category,
+  noVideo: s.noVideo, prev: s.prev, next: s.next,
+  cat: Object.fromEntries(site.categories.map((c) => [c.id, categoryLabel(c.id, lang)])),
+})} />
+
+<style define:vars={{}}>
+  .wall[data-variant='offer'] {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
+    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+</style>

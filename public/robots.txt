@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /offers/
+Disallow: /en/offers/
+Disallow: /admin/
+Disallow: /stats
+
+Sitemap: https://timpanduro.com/sitemap.xml
