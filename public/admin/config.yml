@@ -6,7 +6,7 @@
 #
 # base_url points at this same site — the login is handled by two small
 # functions in netlify/functions/ (auth.mts and callback.mts), so there is no
-# third service to sign up for.
+# third service to sign up for. (now just updating)
 # ---------------------------------------------------------------------------
 
 backend:
