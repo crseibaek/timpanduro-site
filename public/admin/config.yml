@@ -11,7 +11,7 @@
 
 backend:
   name: github
-  repo: BRUGERNAVN/REPOSITORY
+  repo: crseibaek/timpanduro-site
   branch: main
   base_url: https://timpanduro.com
   auth_endpoint: auth
