@@ -10,7 +10,7 @@ description_da: ''
 description_en: ''
 vimeoId: '867050193'
 order: 2
-featured: false
+featured: true
 draft: false
 ---
 
