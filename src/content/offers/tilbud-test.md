@@ -1,6 +1,6 @@
 ---
 customer: tilbud test
-date: 18-08-2026
+date: 17-08-2026
 headline_da: test tilbud
 headline_en: sdf
 intro_da: hej, lad os ta en kop kaffe
