@@ -16,29 +16,35 @@
   "portrait": "/img/portrait.jpg",
   "categories": [
     {
-      "id": "film",
-      "label_da": "Film",
-      "label_en": "Film"
+      "id": "PERFORMANCE",
+      "label_da": "PERFORMANCE",
+      "label_en": "PERFORMANCE"
     },
     {
-      "id": "kultur",
-      "label_da": "Kunst & performance",
-      "label_en": "Art & Performance"
+      "id": "DOCUMENTARY",
+      "label_da": "DOCUMENTARY",
+      "label_en": "DOCUMENTARY"
     },
     {
-      "id": "erhverv",
-      "label_da": "Coporate & commercial",
-      "label_en": "Coporate & commercial"
+      "id": "FICTION",
+      "label_da": "FICTION",
+      "label_en": "FICTION"
+    },
+    {
+      "id": "GASTRONOMY",
+      "label_da": "GASTRONOMY",
+      "label_en": "GASTRONOMY"
+    },
+    {
+      "id": "COPORATE",
+      "label_da": "COPORATE",
+      "label_en": "COPORATE"
     }
   ],
   "about_da": [
-    "1-1-1-1",
-    "2-2-2-2",
-    "3-3-3-3"
+    "x"
   ],
   "about_en": [
-    "1x-x-x-x",
-    "2x-x-x-x",
-    "3x-x-x-x"
+    "x"
   ]
 }
