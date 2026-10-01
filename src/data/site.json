@@ -16,29 +16,9 @@
   "portrait": "/img/portrait.jpg",
   "categories": [
     {
-      "id": "PERFORMANCE",
-      "label_da": "PERFORMANCE",
-      "label_en": "PERFORMANCE"
-    },
-    {
-      "id": "DOCUMENTARY",
-      "label_da": "DOCUMENTARY",
-      "label_en": "DOCUMENTARY"
-    },
-    {
-      "id": "FICTION",
-      "label_da": "FICTION",
-      "label_en": "FICTION"
-    },
-    {
-      "id": "GASTRONOMY",
-      "label_da": "GASTRONOMY",
-      "label_en": "GASTRONOMY"
-    },
-    {
-      "id": "COPORATE",
-      "label_da": "COPORATE",
-      "label_en": "COPORATE"
+      "id": "Performance",
+      "label_da": "Performance",
+      "label_en": "Performance"
     }
   ],
   "about_da": [
