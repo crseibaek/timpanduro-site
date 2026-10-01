@@ -3,7 +3,7 @@ title_da: Axial Figures
 title_en: Axial Figures
 client: ''
 year: 2026
-category: kultur
+category: film
 role_da: ''
 role_en: ''
 description_da: ''
