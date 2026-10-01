@@ -1,44 +1,44 @@
 {
-  "name": "site under construction",
+  "name": "Tim Panduro",
   "shortName": "",
-  "role_da": "Fotograf og klipper",
-  "role_en": "Cinematographer and editor",
-  "tagline_da": "xxx",
-  "tagline_en": "xxx",
-  "email": "kontakt@timpanduro.com",
-  "phone": "+45 00 00 00 00",
-  "city_da": "København",
+  "role_da": "Cinematographer, editor and composer",
+  "role_en": "Cinematographer, editor and composer",
+  "tagline_da": "__",
+  "tagline_en": "__",
+  "email": "mail@timpanduro.com",
+  "phone": "+45 22 16 00 75",
+  "city_da": "Copenhagen",
   "city_en": "Copenhagen",
-  "cvr": "00000000",
+  "cvr": "DK35576444",
   "vimeo": "https://vimeo.com/",
-  "instagram": "",
+  "instagram": "https://www.instagram.com/timpanduro/",
   "linkedin": "",
   "portrait": "/img/portrait.jpg",
   "categories": [
     {
       "id": "film",
-      "label_da": "Film & fiktion",
-      "label_en": "Film & fiction"
+      "label_da": "Film",
+      "label_en": "Film"
     },
     {
       "id": "kultur",
-      "label_da": "Kultur & events",
-      "label_en": "Culture & events"
+      "label_da": "Art & Performance",
+      "label_en": "Art & Performance"
     },
     {
       "id": "erhverv",
-      "label_da": "Erhverv & produkt",
-      "label_en": "Business & product"
+      "label_da": "Coporate",
+      "label_en": "Coporate"
     }
   ],
   "about_da": [
-    "xxx",
-    "xxx",
-    "xxx"
+    "x-x-x-x",
+    "x-x-x-x",
+    "x-x-x-x"
   ],
   "about_en": [
-    "xxx",
-    "xxx",
-    "xxx"
+    "x-x-x-x",
+    "x-x-x-x",
+    "x-x-x-x"
   ]
 }
