@@ -1,5 +1,5 @@
 ---
-title: Dansehallerne - Koreografi
+title: Koreografi
 client: Dansehallerne
 year: 2020
 categories:
