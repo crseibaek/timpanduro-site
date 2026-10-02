@@ -1,0 +1,14 @@
+---
+title: Minds of 99 - Stumper & Stykker
+client: The Bank
+year: 2020
+categories:
+  - documentary
+role: Cinematographer and editor
+description: ''
+vimeoId: '359139944'
+order: 3
+featured: false
+draft: false
+---
+
