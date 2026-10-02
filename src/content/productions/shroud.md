@@ -1,6 +1,6 @@
 ---
 title: Shroud
-client: Himherandit
+client: ''
 year: 2024
 categories:
   - stage
