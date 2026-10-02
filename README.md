@@ -60,7 +60,7 @@ bottom of the wall; give it a low number to pull it up front.
 - **Selected films** — search and tick. The order you pick them is the order on
   the page.
 
-Save, wait about a minute for Netlify to rebuild, then send the link.
+Save, click **Publish Changes**, wait about a minute for Netlify to rebuild, then send the link.
 
 **Seeing whether they looked:** `/stats`, enter the key. It shows opens,
 roughly how many separate people, and when the page was last opened.
@@ -68,6 +68,16 @@ roughly how many separate people, and when the page was last opened.
 ---
 
 ## Things worth knowing
+
+**Saving does not publish.** Every production deploy costs 15 Netlify credits,
+and the free plan has 300 a month. So saving in the admin only stores the
+change in GitHub (the commit gets `[skip ci]`, which Netlify skips). Click
+**Publish Changes** in the admin header when you are done for the session —
+that runs one deploy for everything saved since the last one. It works through
+a Netlify build hook (Project configuration → Build & deploy → Build hooks),
+whose URL is pasted once in the admin under Account → Settings → Advanced.
+Deleting an entry is the exception: it deploys straight away. Code changes
+merged to `main` also deploy (and cost credits) as usual.
 
 **Categories.** There are four: `stage`, `cinema`, `documentary`,
 `commercial`. They are defined once, in `src/data/categories.ts`, and the four
