@@ -1,6 +1,6 @@
 ---
-title: Koreografi
-client: Dansehallerne
+title: Dansehallerne
+client: ''
 year: 2020
 categories:
   - documentary
