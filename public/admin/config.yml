@@ -15,6 +15,12 @@ backend:
   branch: main
   base_url: https://timpanduro.com
   auth_endpoint: auth
+  # Saving does not rebuild the site: every save gets "[skip ci]" in its commit
+  # message, which Netlify skips. Use "Publish Changes" in the admin header to
+  # deploy everything saved since the last publish in one go (one deploy, 15
+  # Netlify credits). It needs the Netlify build hook URL pasted once under
+  # Account → Settings → Advanced in the admin. Deleting an entry still deploys.
+  skip_ci: true
 
 # Where uploaded stills are stored.
 media_folder: public/thumbs
