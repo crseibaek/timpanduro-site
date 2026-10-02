@@ -1,6 +1,6 @@
 ---
 title: Minds of 99
-client: The Bank
+client: ''
 year: 2020
 categories:
   - documentary
