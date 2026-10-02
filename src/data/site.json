@@ -1,30 +1,9 @@
 {
   "name": "Tim Panduro",
-  "shortName": "",
-  "role_da": "Filmskaber baseret i København.",
-  "role_en": "Filmmaker based in Copenhagen.",
-  "tagline_da": "Filmskaber baseret i København.",
-  "tagline_en": "Copenhagen based filmmaker and composer.",
   "email": "mail@timpanduro.com",
   "phone": "+45 22 16 00 75",
-  "city_da": "København",
-  "city_en": "Copenhagen",
   "cvr": "DK35576444",
   "vimeo": "https://vimeo.com/",
   "instagram": "https://www.instagram.com/timpanduro/",
-  "linkedin": "",
-  "portrait": "/img/portrait.jpg",
-  "categories": [
-    {
-      "id": "Performance",
-      "label_da": "Performance",
-      "label_en": "Performance"
-    }
-  ],
-  "about_da": [
-    "x"
-  ],
-  "about_en": [
-    "x"
-  ]
+  "linkedin": ""
 }

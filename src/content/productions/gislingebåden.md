@@ -1,16 +1,13 @@
 ---
-title_da: Gislingebåden
-title_en: ''
+title: Gislingebåden
 client: ''
 year: 2025
-category: film
-role_da: ''
-role_en: ''
-description_da: ''
-description_en: ''
+categories:
+  - cinema
+role: ''
+description: ''
 vimeoId: '1232006484'
 order: 2
 featured: false
 draft: false
 ---
-

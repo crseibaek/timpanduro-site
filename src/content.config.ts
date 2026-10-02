@@ -1,15 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import site from './data/site.json';
-
-// Categories are defined once, in src/data/site.json. Adding one there and in
-// public/admin/config.yml is all it takes — nothing here needs editing.
-const CATEGORY_IDS = site.categories.map((c) => c.id);
-const category = z
-  .string()
-  .refine((v) => CATEGORY_IDS.includes(v), {
-    message: `Unknown category. Valid ids (from src/data/site.json): ${CATEGORY_IDS.join(', ')}`,
-  });
+import { CATEGORY_IDS } from './data/categories';
 
 /**
  * The catalogue of productions. One file per production.
@@ -18,15 +9,13 @@ const category = z
 const productions = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/productions' }),
   schema: z.object({
-    title_da: z.string(),
-    title_en: z.string().optional(),
+    title: z.string(),
     client: z.string().optional(),
     year: z.number(),
-    category,
-    role_da: z.string().optional(),
-    role_en: z.string().optional(),
-    description_da: z.string().optional(),
-    description_en: z.string().optional(),
+    // One or more of the ids in src/data/categories.ts.
+    categories: z.array(z.enum(CATEGORY_IDS)).min(1),
+    role: z.string().optional(),
+    description: z.string().optional(),
     // Vimeo numeric id, e.g. "76979871". Leave empty while placeholding.
     vimeoId: z.string().optional(),
     // Optional override. If absent we fall back to the generated placeholder.
@@ -49,16 +38,13 @@ const offers = defineCollection({
     // Shown as the big greeting on the page.
     customer: z.string(),
     date: z.coerce.date(),
-    headline_da: z.string().optional(),
-    headline_en: z.string().optional(),
-    // The personal note. Markdown.
-    intro_da: z.string(),
-    intro_en: z.string().optional(),
+    headline: z.string().optional(),
+    // The personal note. Blank line between paragraphs.
+    intro: z.string(),
     // Ordered list of production ids (filenames without .md).
     productions: z.array(z.string()).default([]),
     // Optional closing line above the contact button.
-    outro_da: z.string().optional(),
-    outro_en: z.string().optional(),
+    outro: z.string().optional(),
     published: z.boolean().default(true),
   }),
 });

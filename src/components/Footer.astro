@@ -1,13 +1,13 @@
 ---
 import site from '../data/site.json';
-import { t, type Lang } from '../data/ui';
 
-interface Props {
-  lang: Lang;
-}
-const { lang } = Astro.props;
-const s = t(lang);
 const year = 2026;
+const social = [
+  { label: 'Vimeo', href: site.vimeo },
+  { label: 'Instagram', href: site.instagram },
+  { label: 'LinkedIn', href: site.linkedin },
+  // A bare "https://vimeo.com/" is the empty default, not a profile.
+].filter((s) => s.href && !/^https?:\/\/(www\.)?[^/]+\/?$/.test(s.href));
 ---
 
 <footer class="site-footer">
@@ -16,6 +16,7 @@ const year = 2026;
     <span>
       <a href={`mailto:${site.email}`}>{site.email}</a>
       {site.phone && <span> · {site.phone}</span>}
+      {social.map((s) => <span> · <a href={s.href} rel="noopener">{s.label}</a></span>)}
     </span>
   </div>
 </footer>

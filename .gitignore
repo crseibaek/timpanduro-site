@@ -1,0 +1,6 @@
+node_modules/
+dist/
+preview/
+.astro/
+.netlify/
+.DS_Store
