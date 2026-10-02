@@ -1,5 +1,5 @@
 ---
-title: Minds of 99 - Stumper & Stykker
+title: Minds of 99
 client: The Bank
 year: 2020
 categories:
