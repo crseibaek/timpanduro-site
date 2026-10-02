@@ -1,30 +1,95 @@
 ---
 import site from '../data/site.json';
-import { t, localePath, type Lang } from '../data/ui';
+import { CATEGORIES } from '../data/categories';
 
 interface Props {
-  lang: Lang;
-  altPath?: string | null;
+  /** Show the category buttons. Only the wall has anything to filter. */
+  filters?: boolean;
 }
-const { lang, altPath } = Astro.props;
-const s = t(lang);
-const here = Astro.url.pathname.replace(/\/$/, '') || '/';
-
-const workHref = localePath(lang, '/');
-const aboutHref = localePath(lang, lang === 'da' ? '/om' : '/about');
-const other: Lang = lang === 'da' ? 'en' : 'da';
-const otherHref =
-  altPath === null ? null : localePath(other, altPath ?? '/');
+const { filters = false } = Astro.props;
 ---
 
 <header class="site-header">
   <div class="wrap inner">
-    <a class="wordmark" href={workHref}>{site.name}</a>
-    <nav class="nav">
-      <a href={workHref} aria-current={here === workHref.replace(/\/$/, '') || here === '/' && lang === 'da' ? 'page' : undefined}>{s.work}</a>
-      <a href={aboutHref} aria-current={here === aboutHref ? 'page' : undefined}>{s.about}</a>
-      <a href={`mailto:${site.email}`}>{s.contact}</a>
-      {otherHref && <a class="lang" href={otherHref} hreflang={other}>{s.langLabel}</a>}
-    </nav>
+    <a class="wordmark" href="/">{site.name}</a>
+    {
+      filters && (
+        <div class="cats" role="group" aria-label="Filter by category">
+          {CATEGORIES.map((c) => (
+            <button type="button" data-cat={c.id} aria-pressed="false">
+              {c.label}
+            </button>
+          ))}
+        </div>
+      )
+    }
   </div>
 </header>
+
+<script>
+  import { CATEGORY_IDS } from '../data/categories';
+
+  // None pressed = show everything. Several pressed = show productions in
+  // ANY of them. The selection lives in ?c=cinema,documentary so a
+  // filtered wall can be linked to.
+  function boot() {
+    const buttons = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.cats button[data-cat]')
+    );
+    const grid = document.querySelector<HTMLElement>('[data-gallery]');
+    const empty = document.querySelector<HTMLElement>('[data-wall-empty]');
+    if (!buttons.length || !grid) return;
+    const tiles = Array.from(grid.querySelectorAll<HTMLElement>('.tile'));
+
+    const selected = () =>
+      buttons.filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => b.dataset.cat!);
+
+    function apply() {
+      const want = selected();
+      let shown = 0;
+      for (const tile of tiles) {
+        const cats = (tile.dataset.categories || '').split(' ');
+        const show = !want.length || want.some((c) => cats.includes(c));
+        tile.toggleAttribute('hidden', !show);
+        if (show) shown++;
+      }
+      if (empty) empty.hidden = shown > 0;
+    }
+
+    function writeUrl() {
+      try {
+        const url = new URL(location.href);
+        url.searchParams.delete('c');
+        const rest = url.searchParams.toString();
+        const want = selected();
+        const c = want.length ? `c=${want.join(',')}` : '';
+        url.search = [rest, c].filter(Boolean).join('&');
+        history.replaceState(null, '', url);
+      } catch {
+        /* some embeds disallow replaceState — filtering still works */
+      }
+    }
+
+    // Restore from the URL, ignoring anything that isn't a known category.
+    const fromUrl = (new URL(location.href).searchParams.get('c') || '')
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter((s) => (CATEGORY_IDS as readonly string[]).includes(s));
+    for (const b of buttons) {
+      b.setAttribute('aria-pressed', String(fromUrl.includes(b.dataset.cat!)));
+      b.addEventListener('click', () => {
+        const on = b.getAttribute('aria-pressed') === 'true';
+        b.setAttribute('aria-pressed', String(!on));
+        apply();
+        writeUrl();
+      });
+    }
+    apply();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+</script>

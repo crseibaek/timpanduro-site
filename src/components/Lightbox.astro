@@ -1,15 +1,5 @@
----
-import { t, type Lang } from '../data/ui';
-
-interface Props {
-  lang: Lang;
-}
-const { lang } = Astro.props;
-const s = t(lang);
----
-
 <div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Video" hidden>
-  <button class="lb-close" type="button" data-lb-close>{s.close}</button>
+  <button class="lb-close" type="button" data-lb-close>Close</button>
   <div class="lb-inner">
     <div class="lb-frame" data-lb-frame></div>
     <div class="lb-meta">
@@ -20,19 +10,21 @@ const s = t(lang);
       <dl data-lb-dl></dl>
     </div>
     <div class="lb-nav">
-      <button type="button" data-lb-prev>← {s.prev}</button>
-      <button type="button" data-lb-next>{s.next} →</button>
+      <button type="button" data-lb-prev>← Previous</button>
+      <button type="button" data-lb-next>Next →</button>
     </div>
   </div>
 </div>
 
 <script>
+  import { CATEGORY_LABELS, type CategoryId } from '../data/categories';
+
   type Card = {
     id: string;
     title: string;
     client: string;
     year: number;
-    category: string;
+    categories: CategoryId[];
     role: string;
     description: string;
     vimeoId: string;
@@ -41,13 +33,11 @@ const s = t(lang);
 
   function boot() {
     const catEl = document.querySelector<HTMLScriptElement>('script[data-catalogue]');
-    const strEl = document.querySelector<HTMLScriptElement>('script[data-strings]');
     const lb = document.getElementById('lightbox');
     const grid = document.querySelector<HTMLElement>('[data-gallery]');
-    if (!catEl || !strEl || !lb || !grid) return;
+    if (!catEl || !lb || !grid) return;
 
     const cards: Card[] = JSON.parse(catEl.textContent || '[]');
-    const S = JSON.parse(strEl.textContent || '{}');
 
     const frame = lb.querySelector<HTMLElement>('[data-lb-frame]')!;
     const elTitle = lb.querySelector<HTMLElement>('[data-lb-title]')!;
@@ -83,15 +73,15 @@ const s = t(lang);
             /"/g,
             '&quot;'
           )}"></iframe>`
-        : `<div class="ph" style="background-image:url('${c.thumb}')"><span>${S.noVideo}</span></div>`;
+        : `<div class="ph" style="background-image:url('${c.thumb}')"><span>This video is not connected yet.</span></div>`;
 
       elTitle.textContent = c.title;
       elDesc.textContent = c.description || '';
       elDl.innerHTML =
-        row(S.year, String(c.year)) +
-        row(S.client, c.client) +
-        row(S.role, c.role) +
-        row(S.category, S.cat?.[c.category] || '');
+        row('Year', String(c.year)) +
+        row('Client', c.client) +
+        row('Role', c.role) +
+        row('Category', c.categories.map((id) => CATEGORY_LABELS[id] ?? id).join(', '));
 
       const vis = visible();
       const pos = vis.indexOf(i);
@@ -147,37 +137,6 @@ const s = t(lang);
       else if (e.key === 'ArrowLeft') step(-1);
       else if (e.key === 'ArrowRight') step(1);
     });
-
-    // Category filtering.
-    const filterBar = document.querySelector<HTMLElement>('.filters');
-    filterBar?.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-filter]');
-      if (!btn) return;
-      const want = btn.dataset.filter!;
-      filterBar
-        .querySelectorAll<HTMLButtonElement>('button[data-filter]')
-        .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-      grid.querySelectorAll<HTMLElement>('.tile').forEach((tile) => {
-        const show = want === 'all' || tile.dataset.category === want;
-        tile.toggleAttribute('hidden', !show);
-      });
-      try {
-        const url = new URL(location.href);
-        if (want === 'all') url.searchParams.delete('k');
-        else url.searchParams.set('k', want);
-        history.replaceState(null, '', url);
-      } catch {
-        /* file:// and some embeds disallow replaceState — filtering still works */
-      }
-    });
-
-    // Restore a filter from the URL so a filtered view can be linked to.
-    const wanted = new URL(location.href).searchParams.get('k');
-    if (wanted) {
-      filterBar
-        ?.querySelector<HTMLButtonElement>(`button[data-filter="${CSS.escape(wanted)}"]`)
-        ?.click();
-    }
   }
 
   if (document.readyState === 'loading') {

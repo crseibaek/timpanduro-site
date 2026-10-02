@@ -1,7 +1,4 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import type { Lang } from '../data/ui';
-import { pick } from '../data/ui';
-import site from '../data/site.json';
 import { vimeoThumbnails } from './vimeo';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -55,24 +52,18 @@ function localStill(id: string): string | null {
 }
 
 /** Shape a production for the client-side wall/lightbox script. */
-export function toCard(p: Production, lang: Lang, thumbs?: Map<string, string>) {
+export function toCard(p: Production, thumbs?: Map<string, string>) {
   return {
     id: p.id,
-    title: pick(lang, p.data.title_da, p.data.title_en),
+    title: p.data.title,
     client: p.data.client ?? '',
     year: p.data.year,
-    category: p.data.category,
-    role: pick(lang, p.data.role_da, p.data.role_en),
-    description: pick(lang, p.data.description_da, p.data.description_en),
+    categories: p.data.categories,
+    role: p.data.role ?? '',
+    description: p.data.description ?? '',
     vimeoId: p.data.vimeoId ?? '',
     thumb: thumbs?.get(p.id) || p.data.thumbnail || `/thumbs/${p.id}.jpg`,
   };
 }
 
 export type Card = ReturnType<typeof toCard>;
-
-export function categoryLabel(id: string, lang: Lang): string {
-  const c = site.categories.find((x) => x.id === id);
-  if (!c) return id;
-  return lang === 'en' ? c.label_en : c.label_da;
-}

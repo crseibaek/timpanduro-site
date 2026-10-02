@@ -6,14 +6,31 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# The site used to have /en mirror pages and an about page at /om. Send old
+# links to where that content lives now. Specific rules go before /en/*.
+[[redirects]]
+  from = "/en/about"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/en"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/en/*"
+  to = "/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/om"
+  to = "/"
+  status = 301
+
 # Offer pages and the admin must never end up in a search index.
 [[headers]]
   for = "/offers/*"
-  [headers.values]
-    X-Robots-Tag = "noindex, nofollow"
-
-[[headers]]
-  for = "/en/offers/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 

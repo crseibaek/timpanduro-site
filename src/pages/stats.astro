@@ -2,23 +2,23 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base lang="da" title="Statistik" noindex={true} altPath={null}>
+<Base title="Stats" noindex={true}>
   <div class="wrap" style="padding-block: clamp(3rem,8vw,6rem); max-width: 900px">
-    <p class="label">Internt</p>
-    <h1 class="h2" style="margin:0.6rem 0 0.75rem">Hvem har åbnet deres side</h1>
+    <p class="label">Internal</p>
+    <h1 class="h2" style="margin:0.6rem 0 0.75rem">Who has opened their page</h1>
     <p class="lede" style="font-size:1rem">
-      Viser hvornår hver kunde har åbnet sin tilbudsside. Ingen cookies, ingen
-      IP-adresser — kun tidspunkter.
+      Shows when each customer opened their offer page. No cookies, no IP
+      addresses — only times.
     </p>
 
     <div class="field">
       <input
         type="password"
         id="key"
-        placeholder="Adgangsnøgle"
+        placeholder="Access key"
         autocomplete="current-password"
       />
-      <button class="btn" id="go" type="button">Hent</button>
+      <button class="btn" id="go" type="button">Load</button>
     </div>
 
     <p id="msg" style="color:var(--fg-faint); font-size:0.9rem; margin-top:1rem"></p>
@@ -32,39 +32,39 @@ import Base from '../layouts/Base.astro';
     const out = $('#out');
 
     const fmt = (iso: string) =>
-      new Intl.DateTimeFormat('da-DK', {
+      new Intl.DateTimeFormat('en-GB', {
         dateStyle: 'medium',
         timeStyle: 'short',
       }).format(new Date(iso));
 
     const ago = (iso: string) => {
       const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-      if (mins < 60) return `${mins} min. siden`;
+      if (mins < 60) return `${mins} min ago`;
       const h = Math.round(mins / 60);
-      if (h < 48) return `${h} timer siden`;
-      return `${Math.round(h / 24)} dage siden`;
+      if (h < 48) return `${h} hours ago`;
+      return `${Math.round(h / 24)} days ago`;
     };
 
     async function load() {
       const key = input.value.trim();
       if (!key) return;
-      msg.textContent = 'Henter …';
+      msg.textContent = 'Loading …';
       out.innerHTML = '';
       try {
         const r = await fetch(`/api/stats?key=${encodeURIComponent(key)}`);
         if (r.status === 401) {
-          msg.textContent = 'Forkert nøgle.';
+          msg.textContent = 'Wrong key.';
           return;
         }
         if (!r.ok) {
           const j = await r.json().catch(() => ({}));
-          msg.textContent = j.error || `Fejl (${r.status}).`;
+          msg.textContent = j.error || `Error (${r.status}).`;
           return;
         }
         sessionStorage.setItem('statskey', key);
         const { offers } = await r.json();
         if (!offers.length) {
-          msg.textContent = 'Ingen sider er blevet åbnet endnu.';
+          msg.textContent = 'No pages have been opened yet.';
           return;
         }
         msg.textContent = '';
@@ -72,8 +72,8 @@ import Base from '../layouts/Base.astro';
           <table class="stats-table">
             <thead>
               <tr>
-                <th>Kunde</th><th>Åbninger</th><th>Personer</th>
-                <th>Sidst åbnet</th><th>Første gang</th><th></th>
+                <th>Customer</th><th>Opens</th><th>People</th>
+                <th>Last opened</th><th>First time</th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@ import Base from '../layouts/Base.astro';
             </tbody>
           </table>`;
       } catch (e) {
-        msg.textContent = 'Kunne ikke hente data. Er siden deployet på Netlify?';
+        msg.textContent = 'Could not load data. Is the site deployed on Netlify?';
       }
     }
 

@@ -5,9 +5,8 @@ customer to a general showreel, you send them `timpanduro.com/offers/deres-navn`
 page with their name on it, a short personal note, and only the films that are
 relevant to them.
 
-Everything here is placeholder content. The design is real; the 20 productions,
-the name, the contact details and the stills are invented so the thing can be
-looked at before the real material exists.
+Everything is in English — the public site, the admin (`/admin`) and the
+stats page.
 
 ---
 
@@ -15,9 +14,8 @@ looked at before the real material exists.
 
 | Page | Address | What it is |
 |---|---|---|
-| The wall | `/` and `/en` | Every production as a tile, manually ordered, with category filtering and a lightbox player |
-| About | `/om` and `/en/about` | Portrait, three paragraphs, contact details |
-| Offer page | `/offers/<kunde>` | Per-customer page. `noindex`, so it never turns up in Google |
+| The wall | `/` | Every production as a tile, manually ordered, with category toggles in the header and a lightbox player |
+| Offer page | `/offers/<customer>` | Per-customer page. `noindex`, so it never turns up in Google |
 | Admin | `/admin` | Where productions and offer pages are written. Works on a phone |
 | Stats | `/stats` | Which customers have opened their page, and when |
 
@@ -49,17 +47,17 @@ environment variables along with a `STATS_KEY`.
 
 ## Using it (every day)
 
-**Adding a production:** `/admin` → Produktioner → New. The only field that
-really matters is the Vimeo id: the numbers from `vimeo.com/123456789`, so
-`123456789`. Leave `Rækkefølge` at 999 and it lands at the bottom of the wall;
-give it a low number to pull it up front.
+**Adding a production:** `/admin` → Productions → New. Pick at least one
+category. The other field that really matters is the Vimeo ID: the numbers from
+`vimeo.com/123456789`, so `123456789`. Leave `Order` at 999 and it lands at the
+bottom of the wall; give it a low number to pull it up front.
 
-**Making an offer page:** `/admin` → Tilbudssider → New.
+**Making an offer page:** `/admin` → Offer pages → New.
 
-- **Kunde** — this becomes the address. "Byhistorisk Museum" gives
-  `/offers/byhistorisk-museum`.
-- **Din besked** — write it like an email. Blank line between paragraphs.
-- **Udvalgte film** — search and tick. The order you pick them is the order on
+- **Customer** — this becomes the address. "City Museum" gives
+  `/offers/city-museum`.
+- **Your message** — write it like an email. Blank line between paragraphs.
+- **Selected films** — search and tick. The order you pick them is the order on
   the page.
 
 Save, wait about a minute for Netlify to rebuild, then send the link.
@@ -71,11 +69,20 @@ roughly how many separate people, and when the page was last opened.
 
 ## Things worth knowing
 
-**Categories live in two files.** The labels are in `src/data/site.json`; the
-dropdown the admin shows is in `public/admin/config.yml` under
-Produktioner → Kategori. Change both, and keep the `id` values identical. The
-current three (`film`, `kultur`, `erhverv`) are a guess — they should be
-replaced once the real back catalogue exists.
+**Categories.** There are four: `stage`, `cinema`, `documentary`,
+`commercial`. They are defined once, in `src/data/categories.ts`, and the four
+toggles in the header come from there. A production can be in several. The
+admin dropdown in `public/admin/config.yml` (Productions → Categories) has to
+list the same ids, because the admin cannot read code — `npm run build` checks
+the two against each other and fails if they differ.
+
+**Filtering.** No toggle pressed shows everything. Pressing one or more shows
+productions in *any* of the pressed categories. The selection is kept in the
+address, e.g. `/?c=cinema,documentary`, so a filtered wall can be sent as a
+link.
+
+**Old addresses.** The site used to have `/en/...` mirrors and an about page
+at `/om`. `netlify.toml` sends those to their current equivalents with 301s.
 
 **Thumbnails** resolve in this order: an image uploaded in the admin, then
 Vimeo's own poster frame, then a matching file in `public/thumbs/`, then a
@@ -104,20 +111,18 @@ wherever the link was clicked from.
 src/
   content/productions/   one markdown file per production   (written by the admin)
   content/offers/        one markdown file per customer     (written by the admin)
-  data/site.json         name, contact, about text, categories
-  data/ui.ts             every piece of interface text, da + en
-  components/            Gallery (tiles), Lightbox (player), page templates
-  pages/                 routes — /, /om, /offers/[slug], and the /en mirrors
+  data/site.json         name and contact details           (written by the admin)
+  data/categories.ts     the four categories — the only place they are defined
+  components/            Header (category toggles), Gallery (tiles), Lightbox (player), page templates
+  pages/                 routes — /, /offers/[slug], /stats
 netlify/functions/       auth + callback (admin login), track (records an open), stats (reads the log)
 public/admin/            the admin UI and its configuration
-scripts/                 placeholder generation, checks, local preview
+scripts/                 screenshots, local preview
 ```
 
 ## Checks
 
 ```bash
 npm run build
-npx astro preview &        # then, in another shell:
-node scripts/check.mjs     # 24 interaction checks: filtering, lightbox, offers, i18n
 node scripts/make_local_preview.mjs   # regenerates preview/
 ```

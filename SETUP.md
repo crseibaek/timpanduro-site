@@ -84,8 +84,8 @@ the wrong thing — delete it and redo step 4.
 You now have a live site at some address like `sparkling-otter-4f2a.netlify.app`.
 
 **This is your first real checkpoint — open it and click around.** The wall, the
-three category filters, the lightbox, `/om`, and
-`/offers/byhistorisk-museum` should all work. The admin and the stats page will
+four category toggles in the header, the lightbox, and any offer page under
+`/offers/` should all work. The admin and the stats page will
 not work yet; that is expected.
 
 If the build failed, click into the deploy and read the log from the bottom up.
@@ -169,7 +169,7 @@ variables you just added.
 
 **Done when:** https://timpanduro.com/admin shows a *Sign in with GitHub*
 button; clicking it opens a GitHub popup; approving it drops you into the admin
-with **Produktioner**, **Tilbudssider** and **Indstillinger** in the sidebar.
+with **Productions**, **Offer pages** and **Settings** in the sidebar.
 
 Try it end to end: open a production, change a title, save, wait a minute,
 reload the site. If the title changed, the whole chain works.
@@ -196,15 +196,12 @@ picked up.
 
 Everything currently on the site is invented. Best order to swap it out:
 
-1. **Indstillinger** in the admin — real email, phone, CVR, Vimeo profile.
-2. **The about text.** Those three paragraphs are mine. They are pitched about
-   right in length and tone, but they should be Tim's own words; nothing reads
-   more like a template than a bio someone else wrote.
-3. **The portrait** — replace `/img/portrait.jpg` via the Indstillinger page.
-4. **The productions.** Delete the 20 placeholders and add real ones. Do five or
-   ten first and look at the wall before doing all fifty — it is much easier to
-   change your mind about categories at that point.
-5. **The two sample offer pages** — delete them.
+1. **Settings** in the admin — real email, phone, CVR, Vimeo profile.
+2. **The productions.** Delete the 20 placeholders and add real ones. Each one
+   needs at least one category (Stage, Cinema, Documentary, Commercial) and can
+   have several. Titles, roles and descriptions are shown on the site as
+   written, and the site is in English.
+3. **The two sample offer pages** — delete them.
 
 Once real productions exist, the invented stills in `public/thumbs/` can be
 deleted from GitHub.
