@@ -6,7 +6,7 @@ categories:
   - commercial
 role: ''
 description: ''
-vimeoId: https://vimeo.com/1243255243/ebc59e588c?share=copy&fl=sv&fe=ci
+vimeoId: '1243255243'
 order: 13
 featured: false
 draft: false
