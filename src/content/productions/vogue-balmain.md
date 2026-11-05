@@ -1,5 +1,5 @@
 ---
-title: Vogue - Balmain
+title: Vogue
 client: ''
 year: 2018
 categories:
