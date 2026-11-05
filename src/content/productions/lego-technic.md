@@ -1,5 +1,5 @@
 ---
-title: Lego
+title: LEGO
 client: ''
 year: 2026
 categories:
@@ -7,7 +7,7 @@ categories:
 role: ''
 description: ''
 vimeoId: '1231994984'
-order: 999
+order: 10
 featured: false
 draft: false
 ---
