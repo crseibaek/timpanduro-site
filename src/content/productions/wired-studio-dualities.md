@@ -1,5 +1,5 @@
 ---
-title: Wired Studio - Dualities
+title: Wired Studio
 client: ''
 year: 2025
 categories:
