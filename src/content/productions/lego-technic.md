@@ -1,5 +1,5 @@
 ---
-title: Lego Technic
+title: Lego
 client: ''
 year: 2026
 categories:
