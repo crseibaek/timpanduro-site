@@ -1,5 +1,5 @@
 ---
-title: VOGUE - Georgia May Jagger
+title: Vogue
 client: ''
 year: 2018
 categories:
