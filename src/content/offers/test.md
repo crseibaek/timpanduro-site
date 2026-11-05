@@ -1,12 +1,12 @@
 ---
 customer: test
 date: 05-11-2026
-headline: ''
+headline: Test tilbud
 intro: hej
 productions:
   - kokketræf
   - hav
-outro: ''
+outro: Tak for det
 published: true
 ---
 
